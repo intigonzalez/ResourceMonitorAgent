@@ -19,7 +19,6 @@ import java.security.ProtectionDomain;
  * To change this template use File | Settings | File Templates.
  */
 public class BinderClassTransformer implements ClassFileTransformer {
-//    HashMap<ClassLoader, ClassLoaderResourcePrincipal> loaders = new HashMap<ClassLoader, ClassLoaderResourcePrincipal>();
     boolean started = true;
     boolean debug = false;
     public BinderClassTransformer(Instrumentation inst, boolean debug) {
