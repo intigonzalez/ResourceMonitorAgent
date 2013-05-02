@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/ResourceMonitorAgent.iml" filepath="$PROJECT_DIR$/ResourceMonitorAgent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ResourceMonitorArtifacts/ResourceMonitorArtifacts.iml" filepath="$PROJECT_DIR$/ResourceMonitorArtifacts/ResourceMonitorArtifacts.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ResourceMonitorClient/ResourceMonitorClient.iml" filepath="$PROJECT_DIR$/ResourceMonitorClient/ResourceMonitorClient.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ResourceMonitorJavaAgent/ResourceMonitorJavaAgent.iml" filepath="$PROJECT_DIR$/ResourceMonitorJavaAgent/ResourceMonitorJavaAgent.iml" />
+    </modules>
+  </component>
+</project>
+
