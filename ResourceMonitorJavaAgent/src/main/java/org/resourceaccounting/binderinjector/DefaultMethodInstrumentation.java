@@ -2,6 +2,8 @@ package org.resourceaccounting.binderinjector;
 
 import org.objectweb.asm.*;
 
+import java.lang.System;
+
 /**
 * Created with IntelliJ IDEA.
 * User: inti
@@ -56,6 +58,7 @@ public class DefaultMethodInstrumentation extends AbstractMethodInstrumentation 
 //                System.out.printf("Accessing %s\n", involvedClass);
                 loadResourcePrincipal();
                 this.putfield(involvedClass, MONITOR_FIELD_WITH_OWNER_PRINCIPAL, MONITOR_FIELD_WITH_OWNER_PRINCIPAL_DESC);
+//                System.err.printf("\t Putting field in class : %s\n", involvedClass);
                 countOfNew --;
             }
         }

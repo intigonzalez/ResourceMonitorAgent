@@ -1,3 +1,0 @@
-Manifest-Version: 1.0
-Premain-Class: org.resourceaccounting.binderinjector.ResourceCounterAgent
-Boot-Class-Path: ResourceMonitor.jar

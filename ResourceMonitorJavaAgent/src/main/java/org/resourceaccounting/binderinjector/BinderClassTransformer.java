@@ -6,6 +6,7 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.util.TraceClassVisitor;
 
 import java.io.PrintWriter;
+import java.lang.System;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.lang.instrument.Instrumentation;
@@ -21,17 +22,19 @@ import java.security.ProtectionDomain;
 public class BinderClassTransformer implements ClassFileTransformer {
     boolean started = true;
     boolean debug = false;
+    int count = 0;
     public BinderClassTransformer(Instrumentation inst, boolean debug) {
         this.debug = debug;
     }
 
     @Override
     public byte[] transform(ClassLoader classLoader, String s, Class<?> aClass, ProtectionDomain protectionDomain, byte[] bytes) throws IllegalClassFormatException {
-//        System.out.printf("Instrumenting class %s\n", s);
-        if (!started
-                || !ExtraInstrumentationRules.isInstrumentable(s)) {
+        //System.out.printf("Instrumenting class %s\n", s);
+        if (!ExtraInstrumentationRules.isInstrumentable(s)) {
             return bytes;
         }
+
+        System.out.printf("Number of transformed classes : %d, last : %s\n", ++count, s);
 
         ClassReader reader = new ClassReader(bytes);
         ClassWriter writer = new ClassWriter(reader, 0);

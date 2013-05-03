@@ -59,7 +59,7 @@ public class ResourceAccountingTransformer extends ClassVisitor {
                 ((flags & Opcodes.ACC_ABSTRACT) != 0) ||
                 ((flags & Opcodes.ACC_ANNOTATION) != 0);
         shouldAddField = ((flags & Opcodes.ACC_INTERFACE) == 0) &&
-                ((flags & Opcodes.ACC_ABSTRACT) == 0) &&
+//                ((flags & Opcodes.ACC_ABSTRACT) == 0) &&
                 ((flags & Opcodes.ACC_ANNOTATION) == 0) ;
     }
 
