@@ -12,6 +12,11 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.lang.Comparable;
+import java.lang.Object;
+import java.lang.Override;
+import java.lang.String;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import org.jfree.data.xy.XYDataset;
@@ -34,75 +39,37 @@ class AppPanelInformation extends JPanel {
 
     MyXYdata datasetCPU;
     MyXYdata datasetMemory;
+    MyXYdata datasetNetwork;
 
     JFreeChart chartCPU;
     JFreeChart chartMem;
+    JFreeChart chartNetwork;
 
-    class MyXYdata implements  XYDataset {
-
+    class MySerie implements Comparable {
         static final int max = 120;
         double[] x = new double[max];
         double[] y = new double[max];
         int start = 0;
         int end = 0;
         int count = 0;
-        private DatasetGroup dataGroup = new DatasetGroup("0");
 
-        private LinkedList<DatasetChangeListener> listeners = new LinkedList<DatasetChangeListener>();
+        String name;
 
-        MyXYdata() {
+        MySerie(String name) {
+            this.name = name;
         }
 
-        @Override
-        public DomainOrder getDomainOrder() {
-            return DomainOrder.ASCENDING;
-        }
-
-        @Override
-        public int getItemCount(int i) {
-            return count;
-        }
-
-        @Override
-        public Number getX(int serieIndex, int index) {
+        double getX(int index) {
             int i = (start + index) % max;
             return x[i];
         }
 
-        @Override
-        public double getXValue(int serieIndex, int index) {
-            int i = (start + index) % max;
-            return x[i];
-        }
-
-        @Override
-        public Number getY(int serieIndex, int index) {
+        double getY(int index) {
             int i = (start + index) % max;
             return y[i];
         }
 
-        @Override
-        public double getYValue(int serieIndex, int index) {
-            int i = (start + index) % max;
-            return y[i];
-        }
-
-        @Override
-        public int getSeriesCount() {
-            return 1;
-        }
-
-        @Override
-        public Comparable getSeriesKey(int i) {
-            return "CPU";
-        }
-
-        @Override
-        public int indexOf(Comparable comparable) {
-            return 0;
-        }
-
-        public void addPoint( double x, double y) {
+        void addPoint(double x, double y) {
             if (count < max) {
                 this.x[end] = y;
                 this.y[end] = x;
@@ -115,6 +82,82 @@ class AppPanelInformation extends JPanel {
                 this.y[end] = x;
                 end = (end + 1) % max;
             }
+        }
+
+        public int compareTo(Object obj) {
+            return name.compareTo(obj.toString());
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    class MyXYdata implements  XYDataset {
+
+
+        ArrayList<MySerie> series;
+
+        private DatasetGroup dataGroup = new DatasetGroup("0");
+
+        private LinkedList<DatasetChangeListener> listeners = new LinkedList<DatasetChangeListener>();
+
+        MyXYdata(String[] names) {
+            series = new ArrayList<MySerie>();
+            if (names == null) return;
+            for (String string : names)
+                series.add(new MySerie(string));
+        }
+
+        @Override
+        public DomainOrder getDomainOrder() {
+            return DomainOrder.ASCENDING;
+        }
+
+        @Override
+        public int getItemCount(int i) {
+            return series.get(i).count;
+        }
+
+        @Override
+        public Number getX(int serieIndex, int index) {
+            return series.get(serieIndex).getX(index);
+
+        }
+
+        @Override
+        public double getXValue(int serieIndex, int index) {
+            return series.get(serieIndex).getX(index);
+        }
+
+        @Override
+        public Number getY(int serieIndex, int index) {
+            return series.get(serieIndex).getY(index);
+        }
+
+        @Override
+        public double getYValue(int serieIndex, int index) {
+            return series.get(serieIndex).getY(index);
+        }
+
+        @Override
+        public int getSeriesCount() {
+            return series.size();
+        }
+
+        @Override
+        public Comparable getSeriesKey(int i) {
+            return series.get(i);
+        }
+
+        @Override
+        public int indexOf(Comparable comparable) {
+            return series.indexOf(comparable);
+        }
+
+        public void addPoint(int serieIndex, double x, double y) {
+            series.get(serieIndex).addPoint(x,y);
 
             for (DatasetChangeListener l : listeners)
                 l.datasetChanged(new DatasetChangeEvent(this, this));
@@ -147,7 +190,7 @@ class AppPanelInformation extends JPanel {
         this.setLayout(new GridLayout(1, 2));
         this.setBorder(new CompoundBorder(new BevelBorder(BevelBorder.LOWERED), new TitledBorder(appName)));
 
-        datasetCPU = new MyXYdata();
+        datasetCPU = new MyXYdata(new String[]{"CPU"});
         chartCPU = ChartFactory.createXYLineChart("", "Executed Instructions" , "Time", datasetCPU, PlotOrientation.HORIZONTAL, false, false, false);
         NumberAxis na = new NumberAxis("Time");
         na.setAutoRange(true);
@@ -155,25 +198,42 @@ class AppPanelInformation extends JPanel {
         chartCPU.getXYPlot().setRangeAxis(0,na);
         this.add(new ChartPanel(chartCPU));
 
-        datasetMemory = new MyXYdata();
+        datasetMemory = new MyXYdata(new String[]{"Memory"});
         chartMem = ChartFactory.createXYLineChart("", "Allocated Objects" , "Time", datasetMemory, PlotOrientation.HORIZONTAL, false, false, false);
         na = new NumberAxis("Time");
         na.setAutoRange(true);
         na.setAutoRangeIncludesZero(false);
         chartMem.getXYPlot().setRangeAxis(0,na);
         this.add(new ChartPanel(chartMem));
+
+        datasetNetwork = new MyXYdata(new String[]{"Sent", "Received"});
+        chartNetwork = ChartFactory.createXYLineChart("", "Bytes" , "Time", datasetNetwork, PlotOrientation.HORIZONTAL, false, false, false);
+        na = new NumberAxis("Time");
+        na.setAutoRange(true);
+        na.setAutoRangeIncludesZero(false);
+        chartNetwork.getXYPlot().setRangeAxis(0,na);
+        this.add(new ChartPanel(chartNetwork));
     }
 
     public void setCpu(long l) {
         long inStep = l - lastCPU;
         lastCPU = l;
-        datasetCPU.addPoint(System.currentTimeMillis() / 1000 - initial, inStep);
+        datasetCPU.addPoint(0, System.currentTimeMillis() / 1000 - initial, inStep);
         chartCPU.fireChartChanged();
     }
 
     public void setMemory(long l) {
-        datasetMemory.addPoint(System.currentTimeMillis()/ 1000 - initial, l);
+        datasetMemory.addPoint(0, System.currentTimeMillis()/ 1000 - initial, l);
         chartMem.fireChartChanged();
     }
 
+    public void setBytesSent(long l) {
+        datasetNetwork.addPoint(0, System.currentTimeMillis()/ 1000 - initial, l);
+        chartNetwork.fireChartChanged();
+    }
+
+    public void setBytesReceived(long l) {
+        datasetNetwork.addPoint(1, System.currentTimeMillis()/ 1000 - initial, l);
+        chartNetwork.fireChartChanged();
+    }
 }

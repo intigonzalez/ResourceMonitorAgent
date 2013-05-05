@@ -27,14 +27,13 @@ public class BinderClassTransformer implements ClassFileTransformer {
         this.debug = debug;
     }
 
-    @Override
     public byte[] transform(ClassLoader classLoader, String s, Class<?> aClass, ProtectionDomain protectionDomain, byte[] bytes) throws IllegalClassFormatException {
         //System.out.printf("Instrumenting class %s\n", s);
         if (!ExtraInstrumentationRules.isInstrumentable(s)) {
             return bytes;
         }
 
-        System.out.printf("Number of transformed classes : %d, last : %s\n", ++count, s);
+//        System.out.printf("Number of transformed classes : %d, last : %s\n", ++count, s);
 
         ClassReader reader = new ClassReader(bytes);
         ClassWriter writer = new ClassWriter(reader, 0);

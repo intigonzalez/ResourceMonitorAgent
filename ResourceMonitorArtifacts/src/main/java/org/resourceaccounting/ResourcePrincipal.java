@@ -12,6 +12,11 @@ import java.io.Serializable;
 public interface ResourcePrincipal extends Serializable {
     void increaseExecutedInstructions(int n);
     void increaseOwnedObjects(int n);
+    void increaseBytesSent(int n);
+    void increaseBytesReceived(int n);
     long getExecutedInstructions();
     long getAllocatedObjects();
+    long getBytesSent();
+    long getBytesReceived();
 }
+

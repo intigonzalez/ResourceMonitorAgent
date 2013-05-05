@@ -17,7 +17,7 @@ import java.util.Vector;
 public class AppViewer extends AbstractBehaviorObserver<AppPanelInformation> {
 
     JFrame f = new JFrame("");
-    private final MyModel fModel;
+    private MyModel fModel;
 
     public AppViewer() {
         super();
@@ -45,6 +45,8 @@ public class AppViewer extends AbstractBehaviorObserver<AppPanelInformation> {
     protected void updateAssociatedValue(ResourcePrincipal principal, AppPanelInformation v) {
         v.setCpu(principal.getExecutedInstructions());
         v.setMemory(principal.getAllocatedObjects());
+        v.setBytesSent(principal.getBytesSent());
+        v.setBytesReceived(principal.getBytesReceived());
         int index = fModel.getPrincipalIndex(principal);
         if (index != -1) {
             fModel.set(index, new DataPoint(principal,v));
@@ -55,9 +57,14 @@ public class AppViewer extends AbstractBehaviorObserver<AppPanelInformation> {
     protected AppPanelInformation getNewAssociatedValue(ResourcePrincipal principal) {
         AppPanelInformation p = new AppPanelInformation(principal.toString(), principal.getExecutedInstructions());
         fModel.addElement(new DataPoint(principal, p));
-//        f.getContentPane().add(p);
-//        f.pack();
         return p;
+    }
+
+    @Override
+    public void removeApp(ResourcePrincipal rp) {
+        super.removeApp(rp);
+        int index = fModel.getPrincipalIndex(rp);
+        fModel.remove(index);
     }
 
     private class DataPoint {

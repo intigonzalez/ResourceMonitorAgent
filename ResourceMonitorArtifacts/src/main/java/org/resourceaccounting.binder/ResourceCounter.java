@@ -42,6 +42,18 @@ public class ResourceCounter {
         }
     }
 
+    private void innerIncreaseBytesSent(int n, int index) {
+        synchronized (loaders[index]) {
+            loaders[index].increaseBytesSent(n);
+        }
+    }
+
+    private void innerIncreaseBytesReceived(int n, int index) {
+        synchronized (loaders[index]) {
+            loaders[index].increaseBytesReceived(n);
+        }
+    }
+
     private final long innerGetNbObjects(int index) {
         synchronized (loaders[index]) {
             return loaders[index].getAllocatedObjects();
@@ -51,6 +63,18 @@ public class ResourceCounter {
     private final long innerGetNbInstructions(int index) {
         synchronized (loaders[index]) {
             return loaders[index].getExecutedInstructions();
+        }
+    }
+
+    private long innerGetNbBytesSent(int index) {
+        synchronized (loaders[index]) {
+            return loaders[index].getBytesSent();
+        }
+    }
+
+    private long innerGetNbBytesReceived(int index) {
+        synchronized (loaders[index]) {
+            return loaders[index].getBytesReceived();
         }
     }
 
@@ -117,6 +141,16 @@ public class ResourceCounter {
         ourInstance.innerIncreaseObjects(nbObjects, index);
     }
 
+    public static void increaseBytesSent(int n, ResourcePrincipal principal) {
+        int index = ourInstance.search(principal);
+        ourInstance.innerIncreaseBytesSent(n, index);
+    }
+
+    public static void increaseBytesReceived(int n, ResourcePrincipal principal) {
+        int index = ourInstance.search(principal);
+        ourInstance.innerIncreaseBytesReceived(n, index);
+    }
+
     public static long getNbObjects(ResourcePrincipal principal) {
         int index = ourInstance.search(principal);
         return ourInstance.innerGetNbObjects(index);
@@ -125,5 +159,15 @@ public class ResourceCounter {
     public static long getNbInstructions(ResourcePrincipal principal) {
         int index = ourInstance.search(principal);
         return ourInstance.innerGetNbInstructions(index);
+    }
+
+    public static long getNbBytesSent(ResourcePrincipal principal) {
+        int index = ourInstance.search(principal);
+        return ourInstance.innerGetNbBytesSent(index);
+    }
+
+    public static long getNbBytesReceived(ResourcePrincipal principal) {
+        int index = ourInstance.search(principal);
+        return ourInstance.innerGetNbBytesReceived(index);
     }
 }

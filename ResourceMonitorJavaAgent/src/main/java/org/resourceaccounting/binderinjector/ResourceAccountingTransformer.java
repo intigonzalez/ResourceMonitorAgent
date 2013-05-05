@@ -18,6 +18,7 @@ public class ResourceAccountingTransformer extends ClassVisitor {
     private boolean shouldAddField;
     private final ClassLoader classLoader;
     private String superClass;
+    private boolean isClassRelateToNetwork = false;
 
     public ResourceAccountingTransformer(ClassVisitor classVisitor, ClassLoader classLoader) {
         super(Opcodes.ASM4, classVisitor);
@@ -39,7 +40,10 @@ public class ResourceAccountingTransformer extends ClassVisitor {
     private AbstractMethodInstrumentation getMethodInstrumenting(int flags, String methodName, String signature, String s3, String[] strings) {
         MethodVisitor mv = super.visitMethod(flags, methodName, signature, s3, strings);
         DefaultMethodInstrumentation mi = new DefaultMethodInstrumentation(mv, className);
-        return mi;
+        if (!isClassRelateToNetwork)
+            return mi;
+        else
+            return new NetworkAccessMethodInstrumentation(mi, className);
     }
 
     private AbstractMethodInstrumentation getFinalizeMethodInstrumentation(int flags, String methodName, String signature, String s3, String[] strings) {
@@ -52,6 +56,8 @@ public class ResourceAccountingTransformer extends ClassVisitor {
     public void visit(int classVersion, int flags, String name, String signature, String superclass, String[] strings) {
 //        System.out.printf("Transforming class %s\n", s);
         className = name;//.replace('/', '.');
+        isClassRelateToNetwork = className.equals("java/net/SocketInputStream")
+                                || className.equals("java/net/SocketOutputStream");
         superClass = superclass == null? "java/lang/Object":superclass;
         super.visit(classVersion, flags, name, signature, superclass, strings);
         hasFinalize = ((flags & Opcodes.ACC_ENUM) != 0) ||
@@ -69,7 +75,7 @@ public class ResourceAccountingTransformer extends ClassVisitor {
         if (!hasFinalize) {
             AbstractMethodInstrumentation mv = getMethodInstrumenting(Opcodes.ACC_PRIVATE, "finalize","()V", null, null);
             mv.visitCode();
-            mv.load(0, Type.getType(className));
+            mv.load(0, Type.getObjectType(className));
             mv.invokespecial(superClass,"finalize", "()V");
             if (!ExtraInstrumentationRules.isInstrumentable(superClass))
                 DefaultMethodInstrumentation.registerMemoryDeallocation(mv, -1);

@@ -2,8 +2,6 @@ package org.resourceaccounting.binderinjector;
 
 import org.objectweb.asm.*;
 
-import java.lang.System;
-
 /**
 * Created with IntelliJ IDEA.
 * User: inti
@@ -45,12 +43,13 @@ public class DefaultMethodInstrumentation extends AbstractMethodInstrumentation 
 
     @Override
     public void visitFieldInsn(int i, String s, String s2, String s3) {
-        super.visitFieldInsn(i, s, s2, s3);
         readInstructions++;
+        super.visitFieldInsn(i, s, s2, s3);
     }
 
     @Override
     public void visitMethodInsn(int opcode, String involvedClass, String calledMethod, String s3) {
+        readInstructions++;
         super.visitMethodInsn(opcode, involvedClass, calledMethod, s3);
         if (opcode == Opcodes.INVOKESPECIAL && ExtraInstrumentationRules.isInstrumentable(involvedClass)
                 && calledMethod.equals("<init>")) {
@@ -62,12 +61,12 @@ public class DefaultMethodInstrumentation extends AbstractMethodInstrumentation 
                 countOfNew --;
             }
         }
-        readInstructions++;
     }
 
     @Override
     public void visitTypeInsn(int opcode, String involvedClass) {
         // execute the new
+        readInstructions++;
         super.visitTypeInsn(opcode, involvedClass);
         if (opcode == Opcodes.NEW && ExtraInstrumentationRules.isInstrumentable(involvedClass)) {
             // register the creation of the new object
@@ -79,19 +78,18 @@ public class DefaultMethodInstrumentation extends AbstractMethodInstrumentation 
         else if (opcode == Opcodes.ANEWARRAY) {
             //nbNewObjectsInBasicBlock++;
         }
-        readInstructions++;
     }
 
     @Override
     public void visitInsn(int opcode) {
-        boolean  b = (opcode >= Opcodes.IRETURN && opcode <= Opcodes.RETURN);
+        readInstructions++;
+        boolean  b = (opcode >= Opcodes.IRETURN && opcode <= Opcodes.RETURN) || opcode == Opcodes.ATHROW;
         if (b) {
             // register the consumption of resources
             registerConsumption();
         }
         // generate he normal instruction
         super.visitInsn(opcode);
-        readInstructions++;
     }
 
     /**
@@ -128,26 +126,26 @@ public class DefaultMethodInstrumentation extends AbstractMethodInstrumentation 
 
     @Override
     public void visitIntInsn(int opcode, int operand) {
-        super.visitIntInsn(opcode, operand);
         readInstructions++;
+        super.visitIntInsn(opcode, operand);
     }
 
     @Override
     public void visitVarInsn(int opcode, int i2) {
-        super.visitVarInsn(opcode, i2);
         readInstructions++;
+        super.visitVarInsn(opcode, i2);
     }
 
     @Override
     public void visitInvokeDynamicInsn(String s, String s2, Handle handle, Object... objects) {
-        super.visitInvokeDynamicInsn(s, s2, handle, objects);
         readInstructions++;
+        super.visitInvokeDynamicInsn(s, s2, handle, objects);
     }
 
     @Override
     public void visitLdcInsn(Object o) {
-        super.visitLdcInsn(o);
         readInstructions++;
+        super.visitLdcInsn(o);
     }
 
     @Override
@@ -168,36 +166,14 @@ public class DefaultMethodInstrumentation extends AbstractMethodInstrumentation 
 
     @Override
     public void visitMultiANewArrayInsn(String s, int i) {
+        readInstructions++;
         super.visitMultiANewArrayInsn(s, i);
         //nbNewObjectsInBasicBlock++;
-        readInstructions++;
     }
 
     @Override
     public void visitMaxs(int maxStack, int maxLocals) {
         super.visitMaxs(maxStack + 3 + additionalsDup, maxLocals);
-    }
-
-    /**
-     * Generate the code to send a notification about CPU consumption
-     * @param count
-     */
-    private void registerCPUConsumption(int count) {
-        if (count == 0) return;
-        this.iconst(count);
-        loadResourcePrincipal();
-        this.invokestatic(MONITOR_CLASS_NAME, MONITOR_INSTRUCTIONS_EVENT_NAME, MONITOR_INSTRUCTIONS_EVENT_SIG);
-    }
-
-    /**
-     * Generate the code to send a notification about Memory allocation
-     * @param count
-     */
-    public static void registerMemoryAllocation(DefaultMethodInstrumentation adapter,int count) {
-        if (count == 0) return;
-        adapter.iconst(count);
-        adapter.loadResourcePrincipal();
-        adapter.invokestatic(MONITOR_CLASS_NAME, MONITOR_OBJECT_EVENT_NAME, MONITOR_OBJECT_EVENT_SIG);
     }
 
     /**

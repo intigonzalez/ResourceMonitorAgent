@@ -10,7 +10,9 @@ import org.resourceaccounting.ResourcePrincipal;
  * To change this template use File | Settings | File Templates.
  */
 public interface ResourceConsumptionRecorderMBean {
-    public long getMemoryConsumption(ResourcePrincipal appId);
-    public long getExecutedInstruction(ResourcePrincipal appId);
-    public ResourcePrincipal[] getApplications();
+    long getMemoryConsumption(ResourcePrincipal appId);
+    long getExecutedInstruction(ResourcePrincipal appId);
+    long getBytesSent(ResourcePrincipal appId);
+    long getBytesReceived(ResourcePrincipal appId);
+    ResourcePrincipal[] getApplications();
 }

@@ -14,9 +14,11 @@ public abstract class AbstractResourcePrincipal<T> implements ResourcePrincipal 
     private transient T associatedObject;
 
     private static int lastID = 1;
-    protected long nbInstuctions;
+    protected long nbInstructions;
     protected long nbObjects;
     protected int id;
+    protected int nbBytesSent;
+    protected int nbBytesReceived;
 
     /**
      * This is not thread safe
@@ -29,7 +31,7 @@ public abstract class AbstractResourcePrincipal<T> implements ResourcePrincipal 
 
     @Override
     public final void increaseExecutedInstructions(int n) {
-        nbInstuctions += n;
+        nbInstructions += n;
     }
 
     @Override
@@ -38,13 +40,33 @@ public abstract class AbstractResourcePrincipal<T> implements ResourcePrincipal 
     }
 
     @Override
+    public void increaseBytesSent(int n) {
+        nbBytesSent += n;
+    }
+
+    @Override
+    public void increaseBytesReceived(int n) {
+        nbBytesReceived += n;
+    }
+
+    @Override
     public final long getExecutedInstructions() {
-        return nbInstuctions;
+        return nbInstructions;
     }
 
     @Override
     public final long getAllocatedObjects() {
         return nbObjects;
+    }
+
+    @Override
+    public long getBytesSent() {
+        return nbBytesSent;
+    }
+
+    @Override
+    public long getBytesReceived() {
+        return nbBytesReceived;
     }
 
     @Override

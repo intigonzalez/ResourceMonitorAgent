@@ -1,7 +1,5 @@
 package org.resourceaccounting;
 
-import org.resourceaccounting.ResourceConsumptionRecorderMBean;
-import org.resourceaccounting.ResourcePrincipal;
 import org.resourceaccounting.binder.ResourceCounter;
 
 /**
@@ -12,17 +10,22 @@ import org.resourceaccounting.binder.ResourceCounter;
  * To change this template use File | Settings | File Templates.
  */
 public class ResourceConsumptionRecorder implements ResourceConsumptionRecorderMBean {
-    @Override
     public long getMemoryConsumption(ResourcePrincipal appId) {
         return ResourceCounter.getNbObjects(appId);
     }
 
-    @Override
     public long getExecutedInstruction(ResourcePrincipal appId) {
         return ResourceCounter.getNbInstructions(appId);
     }
 
-    @Override
+    public long getBytesSent(ResourcePrincipal appId) {
+        return ResourceCounter.getNbBytesSent(appId);
+    }
+
+    public long getBytesReceived(ResourcePrincipal appId) {
+        return ResourceCounter.getNbBytesReceived(appId);
+    }
+
     public ResourcePrincipal[] getApplications() {
         return ResourceCounter.getApplications();
     }

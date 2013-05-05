@@ -23,8 +23,12 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
         <module name="ResourceMonitorArtifacts" />
+        <module name="ResourceMonitorJavaAgent" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="ResourceMonitorJavaAgent" target="1.5" />
+    </bytecodeTargetLevel>
   </component>
 </project>
 

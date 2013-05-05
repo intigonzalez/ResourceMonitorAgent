@@ -14,7 +14,6 @@ public class IdRetrieveStrategyBasedOnThreadGroup extends AbstractIdRetrieveStra
         super(instructionAdapter);
     }
 
-    @Override
     public void generateByteCodeToGetId() {
         instructionAdapter.invokestatic("java/lang/Thread", "currentThread" ,"()Ljava/lang/Thread;");
         instructionAdapter.invokestatic("org/resourceaccounting/binder/ThreadGroupResourcePrincipal",

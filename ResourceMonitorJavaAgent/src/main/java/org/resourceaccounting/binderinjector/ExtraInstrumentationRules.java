@@ -18,6 +18,8 @@ public class ExtraInstrumentationRules {
                 || className.startsWith("sun/sql/")
                 || className.startsWith("sun/rmi/")
                 || className.startsWith("java/net/Socket")
+                || className.startsWith("java/net/SocketInputStream")
+                || className.startsWith("java/net/SocketOutputStream")
                 )
         return true;
         if (className.startsWith("java/lang/")
